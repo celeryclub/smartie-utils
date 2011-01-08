@@ -5,13 +5,10 @@ exec tclsh "$0" "$@"
 
 package require Tcl 8.4
 
-variable width 20
-variable height 4
-
 # Open serial port and set parameters
 # @parm port    Device (for example, /dev/ttyUSB0)
 # @return Device identifier
-proc connect {device} {
+proc connect {device width height} {
     set f [open $device {RDWR NOCTTY}]
     set baud 9600
     fconfigure $f \
@@ -20,7 +17,7 @@ proc connect {device} {
         -translation binary \
         -encoding binary \
         -ttycontrol {RTS 1 DTR 1}
-    return $f
+    return [list $f $width $height]
 }
 
 # Send a command to the device
@@ -28,7 +25,8 @@ proc connect {device} {
 # @param format Arguments format (as for [binary format])
 # @param args   Arguments
 proc command {fd format args} {
-    puts -nonewline $fd [eval [list binary format c$format 0xfe] $args]
+    set chan [lindex $fd 0]
+    puts -nonewline $chan [eval [list binary format c$format 0xfe] $args]
     after 20
 }
 
@@ -46,8 +44,7 @@ proc backlight {fd mode} {
 # Fill screen by spaces
 # @param fd     Device identifier
 proc clrscr {fd} {
-    variable width
-    variable height
+    lassign $fd chan width height
     for {set i 0} {$i < $height} {incr i} {
         writeLine $fd $i [string repeat " " $width]
     }
@@ -56,7 +53,8 @@ proc clrscr {fd} {
 # Close communication channel
 # @param fd     Device identifier
 proc destroy {fd} {
-    close $fd
+    after 100
+    close [lindex $fd 0]
 }
 
 # Configure display contrast
@@ -71,7 +69,7 @@ proc contrast {fd level} {
 # @param line   Line number (starting from 0)
 # @param str    String to write
 proc writeLine {fd line str} {
-    variable width
+    set width [lindex $fd 1]
     set len [string length $str]
     if {$len > $width} {
         set str [string range $str 0 [expr {$width - 1}]]
@@ -95,8 +93,8 @@ proc customChar {fd char d0 d1 d2 d3 d4 d5 d6 d7} {
 # TEST
 ############################################################################
 
-set f [connect /dev/ttyUSB0]
-#backlight $f on
+set f [connect /dev/ttyUSB0 20 4]
+backlight $f on
 contrast $f 0
 #clrscr $f
 
@@ -106,9 +104,7 @@ customChar $f 0 \
 writeLine $f 0 [clock format [clock seconds] -format "%H:%M:%S %d.%m.%Y"]
 writeLine $f 1 "abcd"
 writeLine $f 2 "abcd"
-writeLine $f 3 "\x00\x00"
+writeLine $f 3 "\x00\x01\x03\x04\x05\x06\x07"
 
-after 100
-flush $f
 destroy $f
 exit
