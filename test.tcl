@@ -32,16 +32,15 @@ proc connect {device} {
 
 # command --
 #
-#   Send 'text' to device with command prefix
+#   Send a command to the device
 #
 # Arguments:
 #   fd      Channel
-#   text    Text to send
+#   format  Arguments format (as for [binary format])
+#   args    Arguments
 
-proc command {fd text} {
-    puts -nonewline $fd [binary format ca* \
-        0xfe $text \
-    ]
+proc command {fd format args} {
+    puts -nonewline $fd [eval [list binary format c$format 0xfe] $args]
     after 20
 }
 
@@ -51,9 +50,9 @@ proc command {fd text} {
 
 proc backlight {fd mode} {
     if {$mode} {
-        command $fd "B\x00"
+        command $fd ac B 0
     } else {
-        command $fd F
+        command $fd a F
     }
 }
 
@@ -82,7 +81,7 @@ proc destroy {fd} {
 #   Configure display contrast (0 (most contrast) to 255 (unreadable))
 
 proc contrast {fd level} {
-    command $fd [binary format ac P $level]
+    command $fd ac P $level
 }
 
 # writeLine --
@@ -102,9 +101,8 @@ proc writeLine {fd line str} {
     } else {
         append str [string repeat " " [expr {$width - $len}]]
     }
-    command $fd [binary format acca* \
-        G 1 [expr {$line+1}] $str \
-    ]
+    command $fd acca* \
+        G 1 [expr {$line+1}] $str
 }
 
 # customChar --
@@ -117,9 +115,8 @@ proc writeLine {fd line str} {
 #   d_i     Bitmask
 
 proc customChar {fd char d0 d1 d2 d3 d4 d5 d6 d7} {
-    command $fd [binary format acc8 \
-        N $char [list $d0 $d1 $d2 $d3 $d4 $d5 $d6 $d7] \
-    ]
+    command $fd acc8 \
+        N $char [list $d0 $d1 $d2 $d3 $d4 $d5 $d6 $d7]
 }
 
 ############################################################################
