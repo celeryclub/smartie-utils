@@ -8,16 +8,9 @@ package require Tcl 8.4
 variable width 20
 variable height 4
 
-# connect --
-#
-#   Open serial port and set parameters
-#
-# Arguments:
-#   port    Device (for example, /dev/ttyUSB0)
-#
-# Return:
-#   Channel identifier
-
+# Open serial port and set parameters
+# @parm port    Device (for example, /dev/ttyUSB0)
+# @return Device identifier
 proc connect {device} {
     set f [open $device {RDWR NOCTTY}]
     set baud 9600
@@ -30,24 +23,18 @@ proc connect {device} {
     return $f
 }
 
-# command --
-#
-#   Send a command to the device
-#
-# Arguments:
-#   fd      Channel
-#   format  Arguments format (as for [binary format])
-#   args    Arguments
-
+# Send a command to the device
+# @param fd     Device identifier
+# @param format Arguments format (as for [binary format])
+# @param args   Arguments
 proc command {fd format args} {
     puts -nonewline $fd [eval [list binary format c$format 0xfe] $args]
     after 20
 }
 
-# backlight --
-#
-#   Enable or disable backlight
-
+# Enable or disable backlight
+# @param fd     Device identifier
+# @param mode   'on' or 'off'
 proc backlight {fd mode} {
     if {$mode} {
         command $fd ac B 0
@@ -56,10 +43,8 @@ proc backlight {fd mode} {
     }
 }
 
-# clrscr --
-#
-#   Fill screen by spaces
-
+# Fill screen by spaces
+# @param fd     Device identifier
 proc clrscr {fd} {
     variable width
     variable height
@@ -68,31 +53,23 @@ proc clrscr {fd} {
     }
 }
 
-# destroy --
-#
-#   Close communication channel
-
+# Close communication channel
+# @param fd     Device identifier
 proc destroy {fd} {
     close $fd
 }
 
-# contrast --
-#
-#   Configure display contrast (0 (most contrast) to 255 (unreadable))
-
+# Configure display contrast
+# @param fd     Device identifier
+# @param level  Contrast level (0 (most contrast) to 255 (unreadable))
 proc contrast {fd level} {
     command $fd ac P $level
 }
 
-# writeLine --
-#
-#   Write text into specified line
-#
-# Arguments:
-#   fd      Channel
-#   line    Line number (starting from 0)
-#   str     String to write
-
+# Write text into specified line
+# @param fd     Device identifier
+# @param line   Line number (starting from 0)
+# @param str    String to write
 proc writeLine {fd line str} {
     variable width
     set len [string length $str]
@@ -105,15 +82,10 @@ proc writeLine {fd line str} {
         G 1 [expr {$line+1}] $str
 }
 
-# customChar --
-#
-#   Define a custom character
-#
-# Arguments:
-#   fd      Channel
-#   char    Character number (0..7 are available)
-#   d_i     Bitmask
-
+# Define a custom character
+# @param fd     Device identifier
+# @param char   Character number (0..7 are available)
+# @param d_i    Bit mask
 proc customChar {fd char d0 d1 d2 d3 d4 d5 d6 d7} {
     command $fd acc8 \
         N $char [list $d0 $d1 $d2 $d3 $d4 $d5 $d6 $d7]
