@@ -1,9 +1,19 @@
-#!/bin/sh
-# \
-exec tclsh "$0" "$@"
 #TODO: license
 
 package require Tcl 8.4
+
+package provide smartie 1.0
+
+namespace eval smartie {
+
+namespace export \
+    connect \
+    backlight \
+    clrscr \
+    destroy \
+    contrast \
+    writeLine \
+    customChar
 
 # Open serial port and set parameters
 # @parm port    Device (for example, /dev/ttyUSB0)
@@ -89,22 +99,4 @@ proc customChar {fd char d0 d1 d2 d3 d4 d5 d6 d7} {
         N $char [list $d0 $d1 $d2 $d3 $d4 $d5 $d6 $d7]
 }
 
-############################################################################
-# TEST
-############################################################################
-
-set f [connect /dev/ttyUSB0 20 4]
-backlight $f on
-contrast $f 0
-#clrscr $f
-
-customChar $f 0 \
-    2 12 22 22 12 33 07 05
-
-writeLine $f 0 [clock format [clock seconds] -format "%H:%M:%S %d.%m.%Y"]
-writeLine $f 1 "abcd"
-writeLine $f 2 "abcd"
-writeLine $f 3 "\x00\x01\x03\x04\x05\x06\x07"
-
-destroy $f
-exit
+}
