@@ -16,9 +16,11 @@ namespace export \
     customChar
 
 # Open serial port and set parameters
-# @parm port    Device (for example, /dev/ttyUSB0)
+# @param port   Device (for example, /dev/ttyUSB0)
+# @param width  Display width
+# @param height Display height
 # @return Device identifier
-proc connect {device width height} {
+proc connect {device {width 20} {height 4}} {
     set f [open $device {RDWR NOCTTY}]
     set baud 9600
     fconfigure $f \
