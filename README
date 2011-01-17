@@ -1,0 +1,12 @@
+smartie-utils is a set or utilities for sureelectronics' LCD Smartie USB
+screens (http://www.sureelectronics.net/goods.php?id=964) and other Matrix
+Orbital-compatible devices.
+
+smartie-ctl  --- set display contrast and brightness
+smartie-cat  --- output text to a display
+smartie-tail --- tail stdin to a display
+
+Author:         Alexander Galanin <al@galanin.nnov.ru>
+Home page:      http://galanin.nnov.ru/~al/
+Project home:   http://code.google.com/p/smartie-utils/
+
