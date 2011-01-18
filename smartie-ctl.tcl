@@ -35,7 +35,7 @@ set options {
     {contrast.arg   ""  "Contrast level (0 - most contrast, 255 - less contrast)"}
     {backlight.arg  ""  "Backlight (0 - off, 1 - on)"}
 }
-set usage ": $argv0 \[options\] -tty <tty>\n    Set LCD screen brightness and contrast\noptions:"
+set usage ": $argv0 \[options\] -tty <tty>\n    Set LCD screen contrast and configure backlight\noptions:"
 if {[catch {
     array set params [::cmdline::getoptions argv $options $usage]
 } err]} {

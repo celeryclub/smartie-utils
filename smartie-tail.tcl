@@ -50,7 +50,10 @@ if {$params(tty) eq "" || [llength $argv] > 1} {
 set height $params(height)
 set lcd [connect $params(tty) $params(width) $height]
 
-set lines [lrepeat $height {}]
+set lines {}
+for {set i 0} {$i < $height} {incr i} {
+    lappend lines {}
+}
 while {![eof stdin]} {
     gets stdin line
     lappend lines $line
