@@ -32,6 +32,7 @@ namespace import ::smartie::*
 
 set options {
     {tty.arg    ""  "TTY for connecting to the device"}
+    {sleep.arg  0   "Sleep specified number of milliseconds between lines"}
     {width.arg  20  "Display width"}
     {height.arg 4   "Display height"}
 }
@@ -60,6 +61,9 @@ while {![eof stdin]} {
     set lines [lrange $lines 1 end]
     for {set i 0} {$i < $height} {incr i} {
         writeLine $lcd $i [lindex $lines $i]
+    }
+    if {$params(sleep) > 0} {
+        after $params(sleep)
     }
 }
 
