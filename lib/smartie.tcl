@@ -41,7 +41,11 @@ namespace export \
 # @param height Display height
 # @return Device identifier
 proc connect {device {width 20} {height 4}} {
-    set f [open $device {RDWR NOCTTY}]
+    if {$::tcl_platform(platform) == "windows"} {
+        set f [open \\\\.\\$device RDWR]
+    } else {
+        set f [open $device {RDWR NOCTTY}]
+    }
     set baud 9600
     fconfigure $f \
         -mode $baud,n,8,1 \
