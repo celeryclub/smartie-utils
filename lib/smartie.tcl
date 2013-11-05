@@ -190,8 +190,8 @@ proc convertCyrillicText {text} {
         \u044D   \xae
         \u042F   \x05
         \u044F   \x05
-        \u0427   4
-        \u0447   4
+        \u0427   \xd1
+        \u0447   \xd1
         \u0421   C
         \u0441   c
         \u041C   M
