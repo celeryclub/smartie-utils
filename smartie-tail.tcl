@@ -36,16 +36,23 @@ set options {
     {width.arg  20  "Display width"}
     {height.arg 4   "Display height"}
 }
-set usage ": $argv0 -tty <tty>\n    Tail stdin to LCD screen\noptions:"
+set usage ": $argv0 -tty <tty> \[filename\\n    Tail stdin or file to LCD screen\noptions:"
 if {[catch {
     array set params [::cmdline::getoptions argv $options $usage]
 } err]} {
     puts stderr $err
     exit 1
 }
-if {$params(tty) eq "" || [llength $argv] > 1} {
+if {$params(tty) eq "" || [llength $argv] > 2} {
     puts stderr [::cmdline::usage $options $usage]
     exit 1
+}
+set fileName [lindex $argv 0]
+
+if {$fileName ne ""} {
+    set in [open $fileName r]
+} else {
+    set in stdin
 }
 
 set height $params(height)
@@ -55,8 +62,8 @@ set lines {}
 for {set i 0} {$i < $height} {incr i} {
     lappend lines {}
 }
-while {![eof stdin]} {
-    gets stdin line
+while {![eof $in]} {
+    gets $in line
     lappend lines $line
     set lines [lrange $lines 1 end]
     for {set i 0} {$i < $height} {incr i} {
@@ -68,4 +75,6 @@ while {![eof stdin]} {
 }
 
 destroy $lcd
-
+if {$in ne "stdin"} {
+    close $in
+}
